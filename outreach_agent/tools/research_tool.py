@@ -102,15 +102,24 @@ CRITICAL INSTRUCTIONS:
                 if text:
                     url_text_map[url] = text
             except Exception as e:
-                print(f"Failed to fetch {url}: {e}")
+                try:
+                    print(f"Failed to fetch {url}: {e}")
+                except UnicodeEncodeError:
+                    print(f"Failed to fetch {ascii(url)}")
                 
     for url, text in url_text_map.items():
         query = unique_urls_map[url]
-        print(f"Analyzing content from: {url}")
+        try:
+            print(f"Analyzing content from: {url}")
+        except UnicodeEncodeError:
+            print(f"Analyzing content from: {ascii(url)}")
             
         # Relevance Gate
         if company.lower() not in text.lower():
-            print(f"  [-] Discarded {url}: no company mention found.")
+            try:
+                print(f"  [-] Discarded {url}: no company mention found.")
+            except UnicodeEncodeError:
+                print(f"  [-] Discarded {ascii(url)}: no company mention found.")
             continue
             
         try:
@@ -122,7 +131,10 @@ CRITICAL INSTRUCTIONS:
                     gap.source_query = query
                     all_gaps.append(gap)
         except Exception as e:
-            print(f"Failed to extract from {url}: {e}")
+            try:
+                print(f"Failed to extract from {url}: {e}")
+            except UnicodeEncodeError:
+                print(f"Failed to extract from {ascii(url)}")
             
     # Rank by confidence descending
     all_gaps.sort(key=lambda g: g.confidence, reverse=True)
